@@ -23,7 +23,7 @@ typedef struct {
 typedef enum {
     DRAW,
     PLAY,
-    PAUSED,
+    PAUSE,
     CLEAR,
 }GameState;
 
@@ -145,17 +145,17 @@ void clear_mode() {
 void modeswitch() {
     switch(currentState){
         case DRAW:{
-                      draw_mode();
-                  } break;
+            draw_mode();
+        } break;
         case PLAY:{
-                      play_mode();
-                  }break;
-        case PAUSED:{
-                        pause_mode();
-                    }break;
+            play_mode();
+        }break;
+        case PAUSE:{
+            pause_mode();
+        }break;
         case CLEAR:{
-                       clear_mode();
-                   }break;
+            clear_mode();
+        }break;
         default: break;
     }
 }
@@ -170,23 +170,21 @@ int main() {
     init_grid();
     currentState = DRAW;
     while(!WindowShouldClose()) {
-        switch(currentState)
-        {
+        switch(currentState){
             case DRAW:{
-                          if (IsKeyPressed(KEY_U)) {
-                              currentState = PLAY;
-                          } else if(IsKeyPressed(KEY_O)) {
-                              currentState = CLEAR;
-                          }
-                      } break;
+                if (IsKeyPressed(KEY_U)) {
+                    currentState = PLAY;
+                } else if(IsKeyPressed(KEY_O)) {
+                    currentState = CLEAR;
+                }
+            } break;
             case PLAY:{
-                          if (IsKeyPressed(KEY_I)) {
-                              currentState = PAUSED;
-                          } else if(IsKeyPressed(KEY_O)) {
-                              currentState = CLEAR;
-
-                          }
-                      }  break;
+                if (IsKeyPressed(KEY_I)) {
+                    currentState = PAUSE;
+                } else if(IsKeyPressed(KEY_O)) {
+                    currentState = CLEAR;
+                }
+            }  break;
             default: break;
         }
         modeswitch();
