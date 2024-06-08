@@ -23,6 +23,7 @@ typedef struct {
 typedef enum {
     DRAW,
     PLAY,
+    PAUSED,
     CLEAR,
 }GameState;
 
@@ -30,7 +31,7 @@ typedef enum {
 
 Cell grid[GRID_HEIGHT][GRID_WIDTH] = {0};
 Vector2 rectanglePosition = {0, 0};
-int currentState = DRAW;
+int currentState;
 
 void init_grid(){
     for(size_t i = 0; i < GRID_HEIGHT; i++)
@@ -42,7 +43,7 @@ void init_grid(){
     }
 }
 
-void draw_cell() {
+void draw_mode() {
     BeginDrawing();
     DrawText("MODE: Draw", 10, 10, 20, LIGHTGRAY);
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -53,8 +54,6 @@ void draw_cell() {
 
         DrawRectangle(x * 20, y * 20, 20, 20, BLACK);
         grid[x][y].state = ALIVE;
-    } else if(IsKeyPressed(KEY_SPACE)) {
-        currentState = PLAY;
     }
     EndDrawing();
 }
@@ -103,22 +102,6 @@ void gen_next() {
 
 }
 
-void redraw() {
-    BeginDrawing();
-    for(size_t i = 0; i < GRID_HEIGHT; i++)
-    {
-        for(size_t j = 0; j < GRID_WIDTH; j++)
-        {
-            if(grid[i][j].state == ALIVE) {
-                DrawRectangle(i*20, j*20, 20, 20, BLACK);
-
-            }
-        }
-    }
-    EndDrawing();
-}
-
-
 int draw_grid(){
     BeginDrawing();
     ClearBackground(BACKGROUND);
@@ -138,30 +121,77 @@ int draw_grid(){
     return alive_count;
 }
 
+void play_mode() {
+    if(draw_grid() != 0){
+        draw_grid();
+        gen_next();
+    } else {
+    ClearBackground(BACKGROUND);
+    currentState = DRAW;
+    }
+}
+
+void pause_mode() {
+    draw_grid();
+    draw_mode();
+}
+
+void clear_mode() {
+    init_grid();
+    ClearBackground(BACKGROUND);
+    currentState = DRAW;
+}
+
+void modeswitch() {
+    switch(currentState){
+        case DRAW:{
+                      draw_mode();
+                  } break;
+        case PLAY:{
+                      play_mode();
+                  }break;
+        case PAUSED:{
+                        pause_mode();
+                    }break;
+        case CLEAR:{
+                       clear_mode();
+                   }break;
+        default: break;
+    }
+}
 
 
 int main() {
     InitWindow(WIDTH, HEIGHT, "Conway's Game of Life"); 
     SetTargetFPS(10);
+    BeginDrawing();
     ClearBackground(BACKGROUND);
+    EndDrawing();
     init_grid();
+    currentState = DRAW;
     while(!WindowShouldClose()) {
-        switch(currentState) {
-            case DRAW:
-                draw_cell();
-                break;
-            case PLAY:
-                if(draw_grid() != 0 && !IsKeyPressed(KEY_SPACE)) {
-                    draw_grid();
-                    gen_next();
-                } else {
-                    ClearBackground(BACKGROUND);
-                    init_grid();
-                    currentState = DRAW;
-                }
-                break;
+        switch(currentState)
+        {
+            case DRAW:{
+                          if (IsKeyPressed(KEY_U)) {
+                              currentState = PLAY;
+                          } else if(IsKeyPressed(KEY_O)) {
+                              currentState = CLEAR;
+                          }
+                      } break;
+            case PLAY:{
+                          if (IsKeyPressed(KEY_I)) {
+                              currentState = PAUSED;
+                          } else if(IsKeyPressed(KEY_O)) {
+                              currentState = CLEAR;
+
+                          }
+                      }  break;
+            default: break;
         }
+        modeswitch();
     }
+
     CloseWindow();
 
     return 0;
