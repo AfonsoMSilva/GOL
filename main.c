@@ -23,8 +23,6 @@ typedef struct {
 typedef enum {
     DRAW,
     PLAY,
-    PAUSE,
-    CLEAR,
 }GameState;
 
 
@@ -43,7 +41,7 @@ void init_grid(){
     }
 }
 
-void draw_mode() {
+void mode_draw() {
     BeginDrawing();
     DrawText("MODE: Draw", 10, 10, 20, LIGHTGRAY);
     if(IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -126,20 +124,12 @@ void play_mode() {
         draw_grid();
         gen_next();
     } else {
-    ClearBackground(BACKGROUND);
     currentState = DRAW;
     }
 }
 
-void pause_mode() {
-    draw_grid();
-    draw_mode();
-}
-
-void clear_mode() {
-    init_grid();
-    ClearBackground(BACKGROUND);
-    currentState = DRAW;
+void draw_mode() {
+    mode_draw();
 }
 
 void modeswitch() {
@@ -149,13 +139,7 @@ void modeswitch() {
         } break;
         case PLAY:{
             play_mode();
-        }break;
-        case PAUSE:{
-            pause_mode();
-        }break;
-        case CLEAR:{
-            clear_mode();
-        }break;
+        } break;
         default: break;
     }
 }
@@ -170,23 +154,13 @@ int main() {
     init_grid();
     currentState = DRAW;
     while(!WindowShouldClose()) {
-        switch(currentState){
-            case DRAW:{
-                if (IsKeyPressed(KEY_U)) {
-                    currentState = PLAY;
-                } else if(IsKeyPressed(KEY_O)) {
-                    currentState = CLEAR;
-                }
-            } break;
-            case PLAY:{
-                if (IsKeyPressed(KEY_I)) {
-                    currentState = PAUSE;
-                } else if(IsKeyPressed(KEY_O)) {
-                    currentState = CLEAR;
-                }
-            }  break;
-            default: break;
-        }
+        if(IsKeyPressed(KEY_U)) {
+                currentState = PLAY;
+        } else if(IsKeyPressed(KEY_Y)) {
+                ClearBackground(BACKGROUND);
+                init_grid();
+                currentState = DRAW;
+            }
         modeswitch();
     }
 
